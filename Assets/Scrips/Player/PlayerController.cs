@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 
 [RequireComponent(typeof(CharacterController))]
@@ -30,26 +31,29 @@ public class PlayerController : MonoBehaviour
     }
     private void ManageMovement()
     {
+        Vector3 moveDirection = GetMoveDirection();
+        Vector3 moveVector = CalculationMoveVector(moveDirection);
+
+        // Sử dụng CharacterController để di chuyển nhân vật
+        characterController.Move(moveVector);
+        playerAnimator.ManageAnimations(moveVector);// animation
+
+    }
+    private Vector3 GetMoveDirection()
+    {
         xInput = joystick.Horizontal;
         yInput = joystick.Vertical;
 
         // Tạo hướng di chuyển từ input joystick
         Vector3 moveDirection = new Vector3(xInput, 0, yInput);
-
-        // có input từ joystick, chuẩn hóa hướng di chuyển để tốc độ ổn định
+        return moveDirection;
+    }
+    private Vector3 CalculationMoveVector(Vector3 moveDirection)
+    {
         if (moveDirection.magnitude > 1)
         {
             moveDirection = moveDirection.normalized;
         }
-
-        // Tính toán vector di chuyển 
-        Vector3 moveVector = moveDirection * moveSpeed * Time.deltaTime;
-
-        // Sử dụng CharacterController để di chuyển nhân vật
-        characterController.Move(moveVector);
-        
-        playerAnimator.ManageAnimations(moveVector);// animation
-        
-    }
-    
+        return moveDirection * moveSpeed * Time.deltaTime;
+    }    
 }
